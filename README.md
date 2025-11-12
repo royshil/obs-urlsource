@@ -156,7 +156,7 @@ $ ./.github/scripts/package-macos -c Release
 
 Use the CI scripts again
 ```sh
-$ ./.github/scripts/build-linux.sh
+$ ./.github/scripts/build-ubuntu
 ```
 
 Copy the results to the standard OBS folders on Ubuntu
