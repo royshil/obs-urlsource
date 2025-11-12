@@ -9,7 +9,7 @@
 !/src
 !/vendor
 !.clang-format
-!.cmake-format.json
+!.gersemirc
 !.gitignore
 !buildspec.json
 !CMakeLists.txt
