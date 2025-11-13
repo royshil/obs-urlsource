@@ -14,8 +14,8 @@ set(pugixml_lib_filename ${CMAKE_STATIC_LIBRARY_PREFIX}pugixml${CMAKE_STATIC_LIB
 
 ExternalProject_Add(
   pugixml_build
-  URL https://github.com/zeux/pugixml/releases/download/v1.13/pugixml-1.13.tar.gz
-  URL_MD5 3e4c588e03bdca140844f3c47c1a995e
+  URL https://github.com/zeux/pugixml/releases/download/v1.15/pugixml-1.15.tar.gz
+  URL_HASH SHA256=655ade57fa703fb421c2eb9a0113b5064bddb145d415dd1f88c79353d90d511a
   CMAKE_GENERATOR ${CMAKE_GENERATOR}
   INSTALL_BYPRODUCTS <INSTALL_DIR>/include
   BUILD_BYPRODUCTS <INSTALL_DIR>/lib/${pugixml_lib_filename}
