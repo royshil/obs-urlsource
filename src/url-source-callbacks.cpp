@@ -67,8 +67,8 @@ void setTextCallback(const std::string &str, const output_mapping &mapping)
 				if (scene == nullptr) {
 					return true;
 				}
-				obs_sceneitem_t *scene_item = obs_scene_find_source(
-					scene, (const char *)target_name_ptr);
+				obs_sceneitem_t *scene_item =
+					obs_scene_find_source(scene, (const char *)target_name_ptr);
 				if (scene_item == nullptr) {
 					return true;
 				}

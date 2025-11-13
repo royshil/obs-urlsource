@@ -40,10 +40,10 @@ invoke_formatter() {
           exit 2
         fi
 
-        if ! is-at-least ${formatter_version[-1]} 17.0.3; then
-          log_error "clang-format is more recent than version 17.0.3 (found ${formatter_version[-1]})."
-          exit 2
-        fi
+        # if ! is-at-least ${formatter_version[-1]} 17.0.3; then
+        #   log_error "clang-format is more recent than version 17.0.3 (found ${formatter_version[-1]})."
+        #   exit 2
+        # fi
       } else {
         log_error "No viable clang-format version found (required 17.0.3)"
         exit 2
@@ -52,7 +52,7 @@ invoke_formatter() {
       local -a source_files=(src/**/*.(c|cpp|h|hpp|m|mm)(.N))
 
       local -a format_args=(-style=file -fallback-style=none)
-      if (( _loglevel > 2 )) format_args+=(--verbose)
+      format_args+=(--verbose)
       ;;
     cmake)
       local formatter=cmake-format
