@@ -25,22 +25,18 @@ if(ENABLE_QT)
   find_package(Qt6 COMPONENTS Widgets Core)
   target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets)
   target_compile_options(
-    ${CMAKE_PROJECT_NAME} PRIVATE $<$<C_COMPILER_ID:Clang,AppleClang>:-Wno-quoted-include-in-framework-header
-                                  -Wno-comma>)
+    ${CMAKE_PROJECT_NAME}
+    PRIVATE $<$<C_COMPILER_ID:Clang,AppleClang>:-Wno-quoted-include-in-framework-header -Wno-comma>
+  )
   set_target_properties(
     ${CMAKE_PROJECT_NAME}
-    PROPERTIES AUTOMOC ON
-               AUTOUIC ON
-               AUTORCC ON)
+    PROPERTIES AUTOMOC ON AUTOUIC ON AUTORCC ON
+  )
 endif()
 
-set(USE_SYSTEM_CURL
-    OFF
-    CACHE STRING "Use system cURL")
+set(USE_SYSTEM_CURL OFF CACHE STRING "Use system cURL")
 
-set(USE_SYSTEM_PUGIXML
-    OFF
-    CACHE STRING "Use system pugixml")
+set(USE_SYSTEM_PUGIXML OFF CACHE STRING "Use system pugixml")
 
 if(USE_SYSTEM_CURL)
   find_package(CURL REQUIRED)
@@ -74,22 +70,24 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE vendor/nlohmann-json)
 
 target_sources(
   ${CMAKE_PROJECT_NAME}
-  PRIVATE src/plugin-main.c
-          src/obs-source-util.cpp
-          src/mapping-data.cpp
-          src/request-data.cpp
-          src/websocket-client.cpp
-          src/ui/CustomTextDocument.cpp
-          src/ui/RequestBuilder.cpp
-          src/ui/text-render-helper.cpp
-          src/ui/outputmapping.cpp
-          src/ui/InputsDialog.cpp
-          src/ui/InputWidget.cpp
-          src/ui/obs-ui-utils.cpp
-          src/url-source-callbacks.cpp
-          src/url-source-info.c
-          src/url-source-thread.cpp
-          src/url-source.cpp)
+  PRIVATE
+    src/plugin-main.c
+    src/obs-source-util.cpp
+    src/mapping-data.cpp
+    src/request-data.cpp
+    src/websocket-client.cpp
+    src/ui/CustomTextDocument.cpp
+    src/ui/RequestBuilder.cpp
+    src/ui/text-render-helper.cpp
+    src/ui/outputmapping.cpp
+    src/ui/InputsDialog.cpp
+    src/ui/InputWidget.cpp
+    src/ui/obs-ui-utils.cpp
+    src/url-source-callbacks.cpp
+    src/url-source-info.c
+    src/url-source-thread.cpp
+    src/url-source.cpp
+)
 add_subdirectory(src/parsers)
 
 set_target_properties_plugin(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME ${_name})

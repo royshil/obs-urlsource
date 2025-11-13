@@ -29,8 +29,11 @@ endif()
 
 # Prohibit in-source builds
 if("${CMAKE_CURRENT_BINARY_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
-  message(FATAL_ERROR "In-source builds are not supported. "
-                      "Specify a build directory via 'cmake -S <SOURCE DIRECTORY> -B <BUILD_DIRECTORY>' instead.")
+  message(
+    FATAL_ERROR
+    "In-source builds are not supported. "
+    "Specify a build directory via 'cmake -S <SOURCE DIRECTORY> -B <BUILD_DIRECTORY>' instead."
+  )
   file(REMOVE_RECURSE "${CMAKE_CURRENT_SOURCE_DIR}/CMakeCache.txt" "${CMAKE_CURRENT_SOURCE_DIR}/CMakeFiles")
 endif()
 
@@ -63,10 +66,17 @@ include(osconfig)
 
 # Allow selection of common build types via UI
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE
-      "RelWithDebInfo"
-      CACHE STRING "OBS build type [Release, RelWithDebInfo, Debug, MinSizeRel]" FORCE)
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS Release RelWithDebInfo Debug MinSizeRel)
+  set(
+    CMAKE_BUILD_TYPE
+    "RelWithDebInfo"
+    CACHE STRING
+    "OBS build type [Release, RelWithDebInfo, Debug, MinSizeRel]"
+    FORCE
+  )
+  set_property(
+    CACHE CMAKE_BUILD_TYPE
+    PROPERTY STRINGS Release RelWithDebInfo Debug MinSizeRel
+  )
 endif()
 
 # Disable exports automatically going into the CMake package registry

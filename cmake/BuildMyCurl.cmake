@@ -35,10 +35,7 @@ else()
   endif()
 endif()
 
-FetchContent_Declare(
-  libcurl_fetch
-  URL ${LibCurl_URL}
-  URL_HASH ${LibCurl_HASH})
+FetchContent_Declare(libcurl_fetch URL ${LibCurl_URL} URL_HASH ${LibCurl_HASH})
 FetchContent_MakeAvailable(libcurl_fetch)
 
 if(MSVC)
@@ -51,8 +48,9 @@ else()
     find_package(OpenSSL REQUIRED)
     set(libcurl_fetch_link_libs "\$<LINK_ONLY:OpenSSL::SSL>;\$<LINK_ONLY:OpenSSL::Crypto>;\$<LINK_ONLY:ZLIB::ZLIB>")
   else()
-    set(libcurl_fetch_link_libs
-        "-framework SystemConfiguration;-framework Security;-framework CoreFoundation;-framework CoreServices;ZLIB::ZLIB"
+    set(
+      libcurl_fetch_link_libs
+      "-framework SystemConfiguration;-framework Security;-framework CoreFoundation;-framework CoreServices;ZLIB::ZLIB"
     )
   endif()
 endif()
@@ -62,12 +60,13 @@ add_library(libcurl STATIC IMPORTED)
 
 set_target_properties(
   libcurl
-  PROPERTIES INTERFACE_COMPILE_DEFINITIONS "CURL_STATICLIB"
-             INTERFACE_INCLUDE_DIRECTORIES "${libcurl_fetch_SOURCE_DIR}/include"
-             INTERFACE_LINK_LIBRARIES "${libcurl_fetch_link_libs}")
-set_property(
-  TARGET libcurl
-  APPEND
-  PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
-set_target_properties(libcurl PROPERTIES IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "C" IMPORTED_LOCATION_RELEASE
-                                                                                       ${libcurl_fetch_lib_location})
+  PROPERTIES
+    INTERFACE_COMPILE_DEFINITIONS "CURL_STATICLIB"
+    INTERFACE_INCLUDE_DIRECTORIES "${libcurl_fetch_SOURCE_DIR}/include"
+    INTERFACE_LINK_LIBRARIES "${libcurl_fetch_link_libs}"
+)
+set_property(TARGET libcurl APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+set_target_properties(
+  libcurl
+  PROPERTIES IMPORTED_LINK_INTERFACE_LANGUAGES_RELEASE "C" IMPORTED_LOCATION_RELEASE ${libcurl_fetch_lib_location}
+)
