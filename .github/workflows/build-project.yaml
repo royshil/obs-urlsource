@@ -177,10 +177,7 @@ jobs:
 
   ubuntu-build:
     name: Build for Ubuntu 🐧
-    strategy:
-      matrix:
-        os: [ubuntu-24.04]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-24.04
     needs: check-event
     defaults:
       run:
