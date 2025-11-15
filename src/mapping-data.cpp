@@ -13,6 +13,8 @@ std::string serialize_output_mapping_data(const output_mapping_data &data)
 		j_mapping["css_props"] = mapping.css_props;
 		j_mapping["unhide_output_source"] = mapping.unhide_output_source;
 		j_mapping["file_path"] = mapping.file_path;
+		j_mapping["filter_name"] = mapping.filter_name;
+		j_mapping["filter_setting_name"] = mapping.filter_setting_name;
 		j.push_back(j_mapping);
 	}
 	return j.dump();
@@ -30,6 +32,8 @@ output_mapping_data deserialize_output_mapping_data(const std::string &data)
 		mapping.css_props = j_mapping.value("css_props", "");
 		mapping.unhide_output_source = j_mapping.value("unhide_output_source", false);
 		mapping.file_path = j_mapping.value("file_path", "");
+		mapping.filter_name = j_mapping.value("filter_name", "");
+		mapping.filter_setting_name = j_mapping.value("filter_setting_name", "");
 		result.mappings.push_back(mapping);
 	}
 	return result;

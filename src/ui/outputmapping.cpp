@@ -55,6 +55,7 @@ OutputMapping::OutputMapping(const output_mapping_data &mapping_data_in,
 				ui->plainTextEdit_cssProps->blockSignals(true);
 				ui->checkBox_unhide_Source->blockSignals(true);
 				ui->lineEdit_file_output->blockSignals(true);
+				ui->lineEdit_filter_setting->blockSignals(true);
 				// set the plainTextEdit_template and plainTextEdit_cssProps to the template_string and css_props of the selected row
 				ui->plainTextEdit_template->setPlainText(
 					this->mapping_data.mappings[row].template_string.c_str());
@@ -64,10 +65,13 @@ OutputMapping::OutputMapping(const output_mapping_data &mapping_data_in,
 					this->mapping_data.mappings[row].unhide_output_source);
 				ui->lineEdit_file_output->setText(
 					this->mapping_data.mappings[row].file_path.c_str());
+				ui->lineEdit_filter_setting->setText(
+					this->mapping_data.mappings[row].filter_setting_name.c_str());
 				ui->plainTextEdit_template->blockSignals(false);
 				ui->plainTextEdit_cssProps->blockSignals(false);
 				ui->checkBox_unhide_Source->blockSignals(false);
 				ui->lineEdit_file_output->blockSignals(false);
+				ui->lineEdit_filter_setting->blockSignals(false);
 			}
 		});
 
@@ -117,6 +121,17 @@ OutputMapping::OutputMapping(const output_mapping_data &mapping_data_in,
 		const auto row = ui->tableView->currentIndex().row();
 		// set the output_source of the selected row to the selected file
 		this->mapping_data.mappings[row].file_path = file.toStdString();
+		// call update_handler
+		this->update_handler(this->mapping_data);
+	});
+
+	// connect lineEdit_filter_setting textChanged to update the mapping filter_setting_name
+	connect(ui->lineEdit_filter_setting, &QLineEdit::textChanged, [this]() {
+		// get the selected row
+		const auto row = ui->tableView->currentIndex().row();
+		// set the filter_setting_name of the selected row to the lineEdit_filter_setting text
+		this->mapping_data.mappings[row].filter_setting_name =
+			ui->lineEdit_filter_setting->text().toStdString();
 		// call update_handler
 		this->update_handler(this->mapping_data);
 	});
@@ -185,6 +200,14 @@ QComboBox *OutputMapping::createSourcesComboBox()
 			ui->widget_file_output->setEnabled(true);
 		} else {
 			ui->widget_file_output->setEnabled(false);
+		}
+		// Check if this is a filter output (contains " -> ")
+		if (output_name.find(" -> ") != std::string::npos) {
+			ui->widget_filter_settings->setEnabled(true);
+			ui->lineEdit_filter_setting->setEnabled(true);
+		} else {
+			ui->widget_filter_settings->setEnabled(false);
+			ui->lineEdit_filter_setting->setEnabled(false);
 		}
 		// remove the prefix from the output_name if it exists
 		std::string output_name_without_prefix = output_name;
