@@ -1,6 +1,4 @@
-# ⚠️ Stalled ⚠️ This project is not under active development
-
-## URL/API Source - Connect Anything to OBS
+# URL/API Source - Connect Anything to OBS
 
 <div align="center">
 
