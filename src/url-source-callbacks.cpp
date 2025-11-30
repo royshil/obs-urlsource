@@ -7,6 +7,7 @@
 #include <obs-module.h>
 
 #include <mutex>
+#include <string>
 #include "ui/text-render-helper.h"
 #include <obs-frontend-api.h>
 
@@ -26,6 +27,90 @@ void acquire_output_source_ref_by_name(const char *output_source_name, obs_sourc
 		obs_log(LOG_ERROR, "Source '%s' not found", output_source_name);
 		*output_source = nullptr;
 	}
+}
+
+void setFilterCallback(const std::string &str, const output_mapping &mapping)
+{
+	// Parse the filter name and source name from output_source
+	std::string source_name, filter_name;
+	if (!parse_filter_output(mapping.output_source, source_name, filter_name)) {
+		obs_log(LOG_ERROR, "Failed to parse filter output: %s", mapping.output_source.c_str());
+		return;
+	}
+
+	// Get the source
+	obs_source_t *source = nullptr;
+	acquire_output_source_ref_by_name(source_name.c_str(), &source);
+	if (source == nullptr) {
+		obs_log(LOG_ERROR, "Source '%s' not found for filter output", source_name.c_str());
+		return;
+	}
+
+	// Get the filter from the source
+	obs_source_t *filter = obs_source_get_filter_by_name(source, filter_name.c_str());
+	if (filter == nullptr) {
+		obs_log(LOG_ERROR, "Filter '%s' not found on source '%s'", filter_name.c_str(), source_name.c_str());
+		obs_source_release(source);
+		return;
+	}
+
+	// Get the filter settings
+	obs_data_t *filter_settings = obs_source_get_settings(filter);
+	if (filter_settings == nullptr) {
+		obs_log(LOG_ERROR, "Failed to get settings for filter '%s'", filter_name.c_str());
+		obs_source_release(filter);
+		obs_source_release(source);
+		return;
+	}
+
+	// Set the filter setting based on the filter_setting_name
+	if (mapping.filter_setting_name.empty()) {
+		obs_log(LOG_ERROR, "Filter setting name is empty");
+		obs_data_release(filter_settings);
+		obs_source_release(filter);
+		obs_source_release(source);
+		return;
+	}
+
+	// Try to parse the value as different types
+	// First, check for boolean string values
+	if (str == "true" || str == "TRUE" || str == "True") {
+		obs_data_set_bool(filter_settings, mapping.filter_setting_name.c_str(), true);
+	} else if (str == "false" || str == "FALSE" || str == "False") {
+		obs_data_set_bool(filter_settings, mapping.filter_setting_name.c_str(), false);
+	} else if (str.size() >= 2 && str[0] == '0' && (str[1] == 'x' || str[1] == 'X')) {
+		// Check for hex color values (0xFFRRGGBB format)
+		try {
+			unsigned long long hex_value = std::stoull(str, nullptr, 16);
+			obs_data_set_int(filter_settings, mapping.filter_setting_name.c_str(), static_cast<long long>(hex_value));
+		} catch (...) {
+			obs_log(LOG_ERROR, "Failed to parse hex value: %s", str.c_str());
+			obs_data_set_string(filter_settings, mapping.filter_setting_name.c_str(), str.c_str());
+		}
+	} else {
+		// Try to parse as integer
+		try {
+			int int_value = std::stoi(str);
+			obs_data_set_int(filter_settings, mapping.filter_setting_name.c_str(), int_value);
+		} catch (...) {
+			// If not an integer, try double
+			try {
+				double double_value = std::stod(str);
+				obs_data_set_double(filter_settings, mapping.filter_setting_name.c_str(), double_value);
+			} catch (...) {
+				// If not a number, treat as string
+				obs_data_set_string(filter_settings, mapping.filter_setting_name.c_str(), str.c_str());
+			}
+		}
+	}
+
+	// Update the filter with the new settings
+	obs_source_update(filter, filter_settings);
+
+	// Release resources
+	obs_data_release(filter_settings);
+	obs_source_release(filter);
+	obs_source_release(source);
 }
 
 void setTextCallback(const std::string &str, const output_mapping &mapping)
@@ -256,8 +341,13 @@ void output_with_mapping(const request_data_handler_response &response, struct u
 		    mapping.output_source != none_internal_rendering &&
 		    mapping.output_source != file_output_rendering &&
 		    mapping.output_source != save_to_setting) {
-			// If an output source is selected - use it for rendering
-			setTextCallback(text, mapping);
+			// Check if this is a filter output (format: "SourceName -> FilterName")
+			if (is_filter_output(mapping.output_source)) {
+				setFilterCallback(text, mapping);
+			} else {
+				// If an output source is selected - use it for rendering
+				setTextCallback(text, mapping);
+			}
 		} else {
 			if (mapping.output_source == save_to_setting) {
 				// If the output source is set to save to settings - save the text to the source settings

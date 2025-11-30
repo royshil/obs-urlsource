@@ -5,6 +5,27 @@
 #include <obs-module.h>
 
 #include <QComboBox>
+#include <string>
+
+// Helper structure to pass data to the filter enumeration callback
+struct filter_enum_data {
+	QComboBox *comboBox;
+	std::string source_name;
+	std::string source_prefix;
+};
+
+// Callback to enumerate filters on a source
+static bool add_filters_to_combobox(obs_source_t *parent, obs_source_t *filter, void *param)
+{
+	filter_enum_data *data = static_cast<filter_enum_data *>(param);
+	const char *filter_name = obs_source_get_name(filter);
+	
+	// Create the filter item format: "(Source) SourceName -> FilterName"
+	std::string filter_item = data->source_prefix + data->source_name + " -> " + filter_name;
+	data->comboBox->addItem(filter_item.c_str());
+	
+	return true; // Continue enumeration
+}
 
 // add_sources_to_list is a helper function that adds all text and media sources to the list
 bool add_sources_to_combobox(void *list_property, obs_source_t *source)
@@ -30,5 +51,14 @@ bool add_sources_to_combobox(void *list_property, obs_source_t *source)
 		name_with_prefix = std::string("(Media) ").append(name);
 	}
 	sources->addItem(name_with_prefix.c_str());
+	
+	// Now enumerate filters on this source
+	filter_enum_data filter_data;
+	filter_data.comboBox = sources;
+	filter_data.source_name = name;
+	filter_data.source_prefix = name_with_prefix.substr(0, name_with_prefix.find(')') + 2);
+	
+	obs_source_enum_filters(source, add_filters_to_combobox, &filter_data);
+	
 	return true;
 }

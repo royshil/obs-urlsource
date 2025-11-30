@@ -17,6 +17,8 @@ struct output_mapping {
 	std::string css_props;
 	bool unhide_output_source = false;
 	std::string file_path;
+	std::string filter_name;
+	std::string filter_setting_name;
 };
 
 struct output_mapping_data {

@@ -49,4 +49,27 @@ inline bool is_valid_output_source_name(const char *output_source_name)
 
 std::string get_source_name_without_prefix(const std::string &source_name);
 
+// Helper function to check if a source/filter name format indicates a filter
+// Format: "(Source) SourceName -> FilterName"
+inline bool is_filter_output(const std::string &output_source) {
+	return output_source.find(" -> ") != std::string::npos;
+}
+
+// Parse filter output string to get source name and filter name
+// Format: "(Source) SourceName -> FilterName"
+inline bool parse_filter_output(const std::string &output_source, std::string &source_name, std::string &filter_name) {
+	size_t arrow_pos = output_source.find(" -> ");
+	if (arrow_pos == std::string::npos) {
+		return false;
+	}
+	
+	source_name = output_source.substr(0, arrow_pos);
+	filter_name = output_source.substr(arrow_pos + 4);
+	
+	// Remove the prefix from source_name if it exists
+	source_name = get_source_name_without_prefix(source_name);
+	
+	return true;
+}
+
 #endif // OBS_SOURCE_UTIL_H
